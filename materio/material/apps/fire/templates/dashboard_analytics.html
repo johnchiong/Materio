@@ -1,240 +1,383 @@
 {% extends layout_path %}
-
 {% load static %}
 {% load i18n %}
 
 {% block title %}Dashboard - Analytics{% endblock title %}
 
 {% block vendor_css %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
 {% endblock vendor_css %}
 
 {% block vendor_js %}
-{{ block.super }}
-<script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  {{ block.super }}
+  <script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+  <!-- Include Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock vendor_js %}
 
 {% block page_js %}
-{{ block.super }}
-<script src="{% static 'js/dashboards-analytics.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    function loadChartData() {
-      // === PIE ===
-      fetch("/chart/pie/")
-        .then((res) => res.json())
-        .then((data) => {
-          const pieCtx = document.getElementById("pieChart").getContext("2d");
-          new Chart(pieCtx, {
-            type: "pie",
-            data: {
-              labels: Object.keys(data),
-              datasets: [{
-                data: Object.values(data),
-                backgroundColor: ["#1d7af3", "#f3545d", "#fdaf4b"]
-              }]
-            },
-            options: {
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: "bottom",
-                }
-              }
-            }
-          });
-        });
-
-      // === LINE ===
-      fetch("/chart/line/")
-        .then((res) => res.json())
-        .then((data) => {
-          const lineCtx = document.getElementById("lineChart").getContext("2d");
-          new Chart(lineCtx, {
-            type: "line",
-            data: {
-              labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-              datasets: [{
-                label: "Incidents",
-                data: Object.values(data),
-                borderColor: "#1d7af3",
-                backgroundColor: "transparent",
-                tension: 0.3,
-                pointRadius: 4
-              }]
-            },
-            options: {
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: "bottom",
-                }
-              }
-            }
-          });
-        });
-
-      // === MULTI-LINE ===
-      fetch("/chart/multiline/")
-        .then((res) => res.json())
-        .then((data) => {
-          const keys = Object.keys(data);
-          const datasets = keys.map((country, i) => {
-            const months = Object.keys(data[country]).sort((a, b) => parseInt(a) - parseInt(b));
-            const color = ["#1fd43f", "#59405d", "#e26a2c"][i];
-            return {
-              label: country,
-              data: months.map((m) => data[country][m]),
-              borderColor: color,
-              backgroundColor: "transparent",
-              pointRadius: 3
-            };
-          });
-          const ctx = document.getElementById("multipleLineChart").getContext("2d");
-          new Chart(ctx, {
-            type: "line",
-            data: {
-              labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-              datasets: datasets
-            },
-            options: {
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: "bottom",
-                }
-              }
-            }
-          });
-        });
-
-      // === MULTI-BAR ===
-      fetch("/chart/multibar/")
-        .then((res) => res.json())
-        .then((data) => {
-          const keys = Object.keys(data);
-          const colors = ["#595d5d", "#f4a84b", "#1174d7"];
-          const datasets = keys.map((severity, i) => {
-            const months = Object.keys(data[severity]).sort((a, b) => parseInt(a) - parseInt(b));
-            return {
-              label: severity,
-              data: months.map((m) => data[severity][m]),
-              backgroundColor: colors[i],
-              borderColor: colors[i]
-            };
-          });
-          const ctx = document.getElementById("multipleBarChart").getContext("2d");
-          new Chart(ctx, {
-            type: "bar",
-            data: {
-              labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-              datasets: datasets
-            },
-            options: {
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: "bottom"
-                }
-              },
-              scales: {
-                x: {
-                  stacked: true
-                },
-                y: {
-                  stacked: true
-                }
-              }
-            }
-          });
-        });
-    }
-    document.addEventListener("DOMContentLoaded", loadChartData);
-</script>
+  {{ block.super }}
+  <script src="{% static 'js/multiline-chart.js' %}"></script> {# Optional: put the script in a static file #}
 {% endblock page_js %}
 
 {% block content %}
 <div class="row gy-6">
-  <!-- Congratulations card -->
-  
-  <!--/ Congratulations card -->
 
-  <!-- Transactions -->
-  
-  <!--/ Transactions -->
-
-  <!-- Weekly Overview Chart -->
-  
-  <!--/ Weekly Overview Chart -->
-
-  <!-- Total Earnings -->
-  
-  <!--/ Total Earnings -->
-
-  <!-- Four Cards -->
- 
-      <!--/ Total Profit line chart -->
-      <!-- Total Profit Weekly Project -->
-      
-      <!--/ Total Profit Weekly Project -->
-      <!-- New Yearly Project -->
-      
-      <!--/ New Yearly Project -->
-      <!-- Sessions chart -->
-     
-      <!--/ Sessions chart -->
-    
-  <!--/ Total Earning -->
-
-  <!-- Sales by Countries -->
-  
-  <!--/ Sales by Countries -->
-
-  <!-- Deposit / Withdraw -->
-  
-  <!-- Deposit / Withdraw -->
-
-  <!-- Data Tables -->
-  
-  <!--/ Data Tables -->
-
-  <!-- Chart.js Custom Charts -->
- <div class="row gy-3 mt-2">
-  <div class="col-4">
+  <!-- 1st Row -->
+  <div class="col-md-6">
     <div class="card">
-      <div class="card-header"><h6 class="mb-0">Fire Incident Pie Ratio</h6></div>
+      <div class="card-header">
+        <div class="card-title">Fire Incidents Severity Chart</div>
+      </div>
       <div class="card-body">
-        <canvas id="pieChart" height="350" style="width:100%;max-width:100%"></canvas>
+        <div class="chart-container">
+          <canvas id="multipleLineChart"></canvas>
+        </div>
       </div>
     </div>
   </div>
-  <div class="col-5">
-    <div class="card">
-      <div class="card-header"><h6 class="mb-0">Incident Timeline</h6></div>
+  <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Fire Incidents Description</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="multipleBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+<!-- 2nd Row -->
+<br>
+<div class="row">
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-header">Firefighters</div>
       <div class="card-body">
-        <canvas id="lineChart" height="350" style="width:100%;max-width:100%"></canvas>
+        <h2>{{ firefighters_count }}</h2>
       </div>
     </div>
   </div>
-  <div class="col-5">
-    <div class="card">
-      <div class="card-header"><h6 class="mb-0">Incident per Country</h6></div>
+
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-header">Fire Trucks</div>
       <div class="card-body">
-        <canvas id="multipleLineChart" height="350" style="width:100%;max-width:100%"></canvas>
+        <h2>{{ firetrucks_count }}</h2>
       </div>
     </div>
   </div>
-  <div class="col-5">
-    <div class="card">
-      <div class="card-header"><h6 class="mb-0">Incident Bar Count</h6></div>
+
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-header">Fire Stations</div>
       <div class="card-body">
-        <canvas id="multipleBarChart" height="350" style="width:100%;max-width:100%"></canvas>
+        <h2>{{ firestations_count }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card text-center">
+      <div class="card-header">Incidents</div>
+      <div class="card-body">
+        <h2>{{ incidents_count }}</h2>
       </div>
     </div>
   </div>
 </div>
-  <!--/ Chart.js Custom Charts -->
+
+<!-- 3rd Row -->
+<br> 
+<div class="row">
+<div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Fire Incidents Pie Chart</div>
+      </div>
+      <div class="card-body">
+        <div class="chart-container">
+          <canvas id="pieChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="col-md-6">
+              <div class="card">
+                  <div class="card-header">
+                      <div class="card-title">Fire Stations per City</div>
+                  </div>
+                  <div class="card-body">
+                      <div class="chart-container">
+                          <canvas id="lineChart"></canvas>
+                      </div>
+                  </div>
+              </div>
+      </div>
+  </div>
+
 </div>
-{% endblock %}
+
+
+<!-- Inline script (if you don’t want a static JS file) -->
+<script>
+  fetch("/multilineChart/")
+    .then((response) => response.json())
+    .then((result_with_month_names) => {
+        var countries = Object.keys(result_with_month_names);
+        var incidentCounts = [];
+        var incidentCounts2 = [];
+        var incidentCounts3 = [];
+
+        function sortObjectKeys(obj) {
+            return Object.keys(obj).sort((a, b) => parseInt(a) - parseInt(b));
+        }
+
+        if (countries.length >= 1) {
+            var country1_data = result_with_month_names[countries[0]];
+            var sortedKeys1 = sortObjectKeys(country1_data);
+            incidentCounts = sortedKeys1.map((key) => country1_data[key]);
+        }
+        if (countries.length >= 2) {
+            var country2_data = result_with_month_names[countries[1]];
+            var sortedKeys2 = sortObjectKeys(country2_data);
+            incidentCounts2 = sortedKeys2.map((key) => country2_data[key]);
+        }
+        if (countries.length >= 3) {
+            var country3_data = result_with_month_names[countries[2]];
+            var sortedKeys3 = sortObjectKeys(country3_data);
+            incidentCounts3 = sortedKeys3.map((key) => country3_data[key]);
+        }
+
+        var multipleLineChart = document.getElementById("multipleLineChart").getContext("2d");
+
+        new Chart(multipleLineChart, {
+            type: "line",
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                datasets: [
+                    {
+                        label: countries[0],
+                        borderColor: "#1fd43f",
+                        pointBorderColor: "#FFF",
+                        pointBackgroundColor: "#1fd43f",
+                        borderWidth: 2,
+                        fill: true,
+                        data: incidentCounts,
+                    },
+                    {
+                        label: countries[1],
+                        borderColor: "#59405d",
+                        pointBorderColor: "#FFF",
+                        pointBackgroundColor: "#59405d",
+                        borderWidth: 2,
+                        fill: true,
+                        data: incidentCounts2,
+                    },
+                    {
+                        label: countries[2],
+                        borderColor: "#e26a2c",
+                        pointBorderColor: "#FFF",
+                        pointBackgroundColor: "#e26a2c",
+                        borderWidth: 2,
+                        fill: true,
+                        data: incidentCounts3,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Fire Incidents by Severity Level",
+                    },
+                    legend: {
+                        position: "bottom",
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: false,
+                    },
+                    y: {
+                        stacked: false,
+                    },
+                },
+            },
+        });
+    })
+    .catch((error) => console.error("Error:", error));
+
+  fetch("/multiBarChart/")
+        .then((response) => response.json())
+        .then((result) => {
+            var severitylevel = Object.keys(result);
+            // Extract incident counts for each severity level
+            var incidentCount_major = [];
+            var incidentCount_minor = [];
+            var incidentCount_moderate = [];
+
+            var months = Object.keys(result);
+            var counts = Object.values(result);
+
+            // Sort function to sort object keys by month
+            function sortObjectKeys(obj) {
+            return Object.keys(obj).sort((a, b) => parseInt(a) - parseInt(b));
+            }
+
+            // Check if data for each severity level exists and extract incident counts
+            if (severitylevel.length >= 1) {
+            var sl1_data = result[severitylevel[0]];
+            var sortedKeys1 = sortObjectKeys(sl1_data);
+            incidentCount_major = sortedKeys1.map((key) => sl1_data[key]);
+            }
+
+            if (severitylevel.length >= 2) {
+            var sl2_data = result[severitylevel[1]];
+            var sortedKeys2 = sortObjectKeys(sl2_data);
+            incidentCount_minor = sortedKeys2.map((key) => sl2_data[key]);
+            }
+
+            if (severitylevel.length >= 3) {
+            var sl3_data = result[severitylevel[2]];
+            var sortedKeys3 = sortObjectKeys(sl3_data);
+            incidentCount_moderate = sortedKeys3.map((key) => sl3_data[key]);
+            }
+
+            // Now create the chart after the data is ready
+            var multipleBarChart = document.getElementById("multipleBarChart").getContext("2d");
+
+            new Chart(multipleBarChart, {
+            type: "bar",
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                datasets: [
+                {
+                    label: "Minor Fire",
+                    backgroundColor: "#595d5d",
+                    borderColor: "#595d5d",
+                    data: incidentCount_minor,
+                },
+                {
+                    label: "Moderate Fire",
+                    backgroundColor: "#f4a84b",
+                    borderColor: "#f4a84b",
+                    data: incidentCount_moderate,
+                },
+                {
+                    label: "Major Fire",
+                    backgroundColor: "#1174d7",
+                    borderColor: "#1174d7",
+                    data: incidentCount_major,
+                },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {
+                position: "bottom",
+                },
+                title: {
+                display: true,
+                text: "Fire Incidents by Severity Level",
+                },
+                tooltips: {
+                mode: "index",
+                intersect: false,
+                },
+                scales: {
+                xAxes: [
+                    {
+                    stacked: true,
+                    },
+                ],
+                yAxes: [
+                    {
+                    stacked: true,
+                    },
+                ],
+                },
+            },
+            });
+        })
+        .catch((error) => console.error("Error:", error));
+
+  fetch("/pieChart/")
+  .then((response) => response.json())
+  .then((result) => {
+    var pieChart = document.getElementById("pieChart").getContext("2d");
+    new Chart(pieChart, {
+      type: "pie",
+      data: {
+        labels: result.labels,
+        datasets: [{
+          data: result.counts,
+          backgroundColor: ["#f3545d", "#fdaf4b", "#1d7af3"],
+          borderWidth: 0,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: { position: "bottom" },
+        layout: { padding: { left: 20, right: 20, top: 20, bottom: 20 } },
+      },
+    });
+  });
+
+fetch("/lineChart/")
+  .then((response) => response.json())
+  .then((result) => {
+    var cities = Object.keys(result);
+    var counts = Object.values(result);
+    var lineChart = document.getElementById("lineChart").getContext("2d");
+
+    new Chart(lineChart, {
+      type: "line",
+      data: {
+        labels: cities,
+        datasets: [
+          {
+            label: "Fire Stations in Cities",
+            borderColor: "#1d7af3",
+            pointBorderColor: "#FFF",
+            pointBackgroundColor: "#1d7af3",
+            pointBorderWidth: 2,
+            pointHoverRadius: 4,
+            pointHoverBorderWidth: 1,
+            pointRadius: 4,
+            backgroundColor: "transparent",
+            fill: true,
+            borderWidth: 2,
+            data: counts,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              padding: 10,
+              color: "#1d7af3",
+            },
+          },
+        },
+        layout: {
+          padding: { left: 15, right: 15, top: 15, bottom: 15 },
+        },
+      },
+    });
+  })
+  .catch((error) => console.error("Error:", error));
+</script>
+{% endblock content %}
