@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import DashboardsView, MultilineIncidentTop3Country, multipleBarbySeverity
-from .views import PieCountbySeverity, LineCountFirestations
+from .views import PieCountbySeverity, LineCountFirestations ,FireStationtList
 
 
 
